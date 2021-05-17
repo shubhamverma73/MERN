@@ -152,4 +152,30 @@ router.get('/logout', auth, async (req, res) => {
     }
 });
 
+
+router.get('/messages', async (req, res) => {
+    /*
+    ===================================== Search Machanishm ======================================
+    https://stackoverflow.com/questions/26699885/how-can-i-use-a-regex-variable-in-a-query-for-mongodb
+
+    db.users.find(name: new RegExp(search)) //For substring search, case sensitive. 
+    db.users.find(name: new RegExp('^' + search + '$')) //For exact search, case sensitive
+    db.users.find(name: new RegExp(search， ‘i')) //For substring search, case insensitive
+    db.users.find(name: new RegExp('^' +search + '$', 'i')); //For exact search, case insensitive
+    ===================================== Search Machanishm ======================================
+    */
+    try {
+        let message = req.body.message;
+        const isMessage   = await User.findOne({"messages.message": new RegExp(message, 'i') });
+        if(isMessage) {
+            common.handleData(req, res, "Message Available");
+        } else {
+            common.handleError(req, res, 'Message not available, search another message.');
+        }
+    }
+    catch(err) {
+        common.handleError(err, res, '');
+    }
+});
+
 module.exports = router;
